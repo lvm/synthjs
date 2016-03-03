@@ -64,8 +64,13 @@ context.**createEnvelope**(a, d, s, r)
 
 ###Instruments###
 
-context.**createDrum**()
-context.**createHiHat**()
+*context.**createDrum**()*  
+context.**createBassDrum**()  
+context.**createSnare**()  
+context.**createClap**()  
+context.**createRim**()  
+context.**createHiHat**()  
+context.**createOpenhat**()  
 
 *Methods*
 
