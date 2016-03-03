@@ -64,7 +64,7 @@
   }
 
   function FeedbackDelayFactory(context, delayTime, feedback){
-    var delay = context.createDelayNode(delayTime + 1);
+    var delay = context.createDelay(delayTime + 1);
     FeedbackDelayNode.call(delay, context, delayTime, feedback);
     return delay;
   }
@@ -99,8 +99,8 @@
   function Drum(context){
     var osc = this.osc = context.createOscillator();
     osc.frequency.value = 45;
-      osc.type = 'sine';
-      var env = this.env = context.createEnvelope(0.001, 0.1, 0, 0.5);
+    osc.type = 'sine';
+    var env = this.env = context.createEnvelope(0.001, 0.1, 0, 0.5);
     osc.connect(env);
   }
 
@@ -111,10 +111,80 @@
     this.env.connect(dest);
   }
 
+  function BassDrum(context){
+    this.noiseGen = context.createNoiseGen();
+    this.filter = context.createBiquadFilter();
+    this.filter.type = "lowpass";
+    this.filter.frequency.value = 100;
+    this.noiseGen.connect(this.filter);
+    this.env = context.createEnvelope(0.001, 0.05, 0.01, 0.2);
+    this.filter.connect(this.env);
+  }
+
+  BassDrum.prototype.trigger = function(){
+    this.env.trigger(0.025);
+  }
+  BassDrum.prototype.connect = function(dest){
+    this.env.connect(dest);
+  }
+
+  function Snare(context){
+    this.noiseGen = context.createNoiseGen();
+    this.filter = context.createBiquadFilter();
+    this.filter.type = "highpass";
+    this.filter.frequency.value = 750;
+    this.noiseGen.connect(this.filter);
+    this.env = context.createEnvelope(0.001, 0.05, 0, 0.1);
+    this.filter.connect(this.env);
+  }
+
+  Snare.prototype.trigger = function(){
+    this.env.trigger(0.025);
+  }
+  Snare.prototype.connect = function(dest){
+    this.env.connect(dest);
+  }
+
+  function Clap(context){
+    this.noiseGen = context.createNoiseGen();
+    this.filter = context.createBiquadFilter();
+    this.filter.type = "bandpass";
+    this.filter.frequency.value = 950;
+    this.filter.Q.value = 1;
+    this.noiseGen.connect(this.filter);
+    this.env = context.createEnvelope(0.001, 0.01, 0.1, 0.1);
+    this.filter.connect(this.env);
+  }
+
+  Clap.prototype.trigger = function(){
+    this.env.trigger(0.025);
+  }
+  Clap.prototype.connect = function(dest){
+    this.env.connect(dest);
+  }
+
+  function Rim(context){
+    this.noiseGen = context.createNoiseGen();
+    this.filter = context.createBiquadFilter();
+    this.filter.type = "bandpass";
+    this.filter.frequency.value = 950;
+    this.filter.Q.value = 10;
+    this.noiseGen.connect(this.filter);
+    this.env = context.createEnvelope(0.001, 0.01, 0.1, 0.1);
+    this.filter.connect(this.env);
+  }
+
+  Rim.prototype.trigger = function(){
+    this.env.trigger(0.025);
+  }
+  Rim.prototype.connect = function(dest){
+    this.env.connect(dest);
+  }
+
   function HiHat(context){
     this.noiseGen = context.createNoiseGen();
     this.filter = context.createBiquadFilter();
-      this.filter.type = "highpass";
+    this.filter.type = "highpass";
     this.filter.frequency.value = 5000;
     this.noiseGen.connect(this.filter);
     this.env = context.createEnvelope(0.001, 0.05, 0, 0.2);
@@ -128,8 +198,30 @@
     this.env.connect(dest);
   }
 
+  function Openhat(context){
+    this.noiseGen = context.createNoiseGen();
+    this.filter = context.createBiquadFilter();
+    this.filter.type = "highpass";
+    this.filter.frequency.value = 10000;
+    this.noiseGen.connect(this.filter);
+    this.env = context.createEnvelope(0.001, 0.05, 0, 0.6);
+    this.filter.connect(this.env);
+  }
+
+  Openhat.prototype.trigger = function(){
+    this.env.trigger(0.025);
+  }
+  Openhat.prototype.connect = function(dest){
+    this.env.connect(dest);
+  }
+
   AudioContext.prototype.createDrum = function(){ return new Drum(this); };
+  AudioContext.prototype.createBassDrum = function(){ return new BassDrum(this); };
+  AudioContext.prototype.createSnare = function(){ return new Snare(this); };
+  AudioContext.prototype.createClap = function(){ return new Clap(this); };
+  AudioContext.prototype.createRim = function(){ return new Rim(this); };
   AudioContext.prototype.createHiHat = function(){ return new HiHat(this); };
+  AudioContext.prototype.createOpenhat = function(){ return new Openhat(this); };
 
   /** LOOP **/
 
