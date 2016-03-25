@@ -96,12 +96,13 @@
 
   /** INSTRUMENTS **/
 
-  function Drum(context){
-    var osc = this.osc = context.createOscillator();
-    osc.frequency.value = 45;
-    osc.type = 'sine';
-    var env = this.env = context.createEnvelope(0.001, 0.1, 0, 0.5);
-    osc.connect(env);
+  function Drum(context, freq, a, d, s, r){
+    this.osc = context.createOscillator();
+    this.osc.frequency.value = freq;
+    this.osc.type = 'square';
+    var env = this.env = context.createEnvelope(a, d, s, r);
+    this.osc.start(0);
+    this.osc.connect(this.env);
   }
 
   Drum.prototype.trigger = function(){
@@ -111,30 +112,13 @@
     this.env.connect(dest);
   }
 
-  function BassDrum(context){
-    this.noiseGen = context.createNoiseGen();
-    this.filter = context.createBiquadFilter();
-    this.filter.type = "lowpass";
-    this.filter.frequency.value = 100;
-    this.noiseGen.connect(this.filter);
-    this.env = context.createEnvelope(0.001, 0.05, 0.01, 0.2);
-    this.filter.connect(this.env);
-  }
-
-  BassDrum.prototype.trigger = function(){
-    this.env.trigger(0.025);
-  }
-  BassDrum.prototype.connect = function(dest){
-    this.env.connect(dest);
-  }
-
-  function Snare(context){
+  function Snare(context, freq, a, d, s, r){
     this.noiseGen = context.createNoiseGen();
     this.filter = context.createBiquadFilter();
     this.filter.type = "highpass";
-    this.filter.frequency.value = 750;
+    this.filter.frequency.value = freq;
     this.noiseGen.connect(this.filter);
-    this.env = context.createEnvelope(0.001, 0.05, 0, 0.1);
+    this.env = context.createEnvelope(a,d,s,r);
     this.filter.connect(this.env);
   }
 
@@ -145,14 +129,14 @@
     this.env.connect(dest);
   }
 
-  function Clap(context){
+  function Clap(context, freq, a, d, s, r){
     this.noiseGen = context.createNoiseGen();
     this.filter = context.createBiquadFilter();
     this.filter.type = "bandpass";
-    this.filter.frequency.value = 950;
+    this.filter.frequency.value = freq;
     this.filter.Q.value = 1;
     this.noiseGen.connect(this.filter);
-    this.env = context.createEnvelope(0.001, 0.01, 0.1, 0.1);
+    this.env = context.createEnvelope(a,d,s,r);
     this.filter.connect(this.env);
   }
 
@@ -163,14 +147,14 @@
     this.env.connect(dest);
   }
 
-  function Rim(context){
+  function Rim(context, freq, a, d, s, r){
     this.noiseGen = context.createNoiseGen();
     this.filter = context.createBiquadFilter();
     this.filter.type = "bandpass";
-    this.filter.frequency.value = 950;
+    this.filter.frequency.value = freq;
     this.filter.Q.value = 10;
     this.noiseGen.connect(this.filter);
-    this.env = context.createEnvelope(0.001, 0.01, 0.1, 0.1);
+    this.env = context.createEnvelope(a,d,s,r);
     this.filter.connect(this.env);
   }
 
@@ -181,13 +165,30 @@
     this.env.connect(dest);
   }
 
-  function HiHat(context){
+  function Closehat(context, freq, a, d, s, r){
+    this.noiseGen = context.createNoiseGen();
+    this.filter = context.createBiquadFilter();
+    this.filter.type = "bandpass";
+    this.filter.frequency.value = freq;
+    this.noiseGen.connect(this.filter);
+    this.env = context.createEnvelope(a,d,s,r); //);
+    this.filter.connect(this.env);
+  }
+
+  Closehat.prototype.trigger = function(){
+    this.env.trigger(0.025);
+  }
+  Closehat.prototype.connect = function(dest){
+    this.env.connect(dest);
+  }
+
+  function HiHat(context, freq, a, d, s, r){
     this.noiseGen = context.createNoiseGen();
     this.filter = context.createBiquadFilter();
     this.filter.type = "highpass";
-    this.filter.frequency.value = 5000;
+    this.filter.frequency.value = freq;
     this.noiseGen.connect(this.filter);
-    this.env = context.createEnvelope(0.001, 0.05, 0, 0.2);
+    this.env = context.createEnvelope(a,d,s,r);
     this.filter.connect(this.env);
   }
 
@@ -198,13 +199,13 @@
     this.env.connect(dest);
   }
 
-  function Openhat(context){
+  function Openhat(context, freq, a, d, s, r){
     this.noiseGen = context.createNoiseGen();
     this.filter = context.createBiquadFilter();
     this.filter.type = "highpass";
-    this.filter.frequency.value = 10000;
+    this.filter.frequency.value = freq;
     this.noiseGen.connect(this.filter);
-    this.env = context.createEnvelope(0.001, 0.05, 0, 0.6);
+    this.env = context.createEnvelope(a,d,s,r);
     this.filter.connect(this.env);
   }
 
@@ -215,13 +216,32 @@
     this.env.connect(dest);
   }
 
-  AudioContext.prototype.createDrum = function(){ return new Drum(this); };
-  AudioContext.prototype.createBassDrum = function(){ return new BassDrum(this); };
-  AudioContext.prototype.createSnare = function(){ return new Snare(this); };
-  AudioContext.prototype.createClap = function(){ return new Clap(this); };
-  AudioContext.prototype.createRim = function(){ return new Rim(this); };
-  AudioContext.prototype.createHiHat = function(){ return new HiHat(this); };
-  AudioContext.prototype.createOpenhat = function(){ return new Openhat(this); };
+  // bass drum
+  AudioContext.prototype.createDrum = function(freq,a,d,s,r){
+    return new Drum(this, freq||50, a||0.001, d||0.1, s||0, r||0.5);
+  };
+
+  // snare, toms
+  AudioContext.prototype.createSnare = function(freq,a,d,s,r){
+    return new Snare(this, freq||750, a||0.001, d||0.05, s||0, r||0.1);
+  };
+  AudioContext.prototype.createClap = function(freq,a,d,s,r){
+    return new Clap(this,freq||950,a||0.001,d||0.01,s||0.1,r||0.1);
+  };
+  AudioContext.prototype.createRim = function(freq,a,d,s,r){
+    return new Rim(this,freq||950,a||0.001,d||0.01,s||0.1,r||0.1);
+  };
+
+  // hats
+  AudioContext.prototype.createClosehat = function(freq,a,d,s,r){
+    return new Closehat(this, freq||10000,a||0.001,d||0.05,s||0,r||0.15);
+  };
+  AudioContext.prototype.createHiHat = function(freq,a,d,s,r){
+    return new HiHat(this,freq||5000,a||0.001, d||0.05, s||0, r||0.2);
+  };
+  AudioContext.prototype.createOpenhat = function(freq,a,d,s,r){
+    return new Openhat(this,freq||10000,a||0.001,d||0.05,s||0,r||0.6);
+  };
 
   /** LOOP **/
 

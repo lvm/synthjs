@@ -7,25 +7,30 @@
   <body>
     <script type="text/javascript">
      var context = new AudioContext();
-     var loop;
+     var loop,
+     ch, hh, oh, bd, sn, cp, rm
+     ;
 
      function initLoop() {
-       var hh = context.createHiHat();
+       ch = context.createClosehat();
+       ch.connect(context.destination);
+
+       hh = context.createHiHat();
        hh.connect(context.destination);
 
-       var oh = context.createOpenhat();
+       oh = context.createOpenhat();
        oh.connect(context.destination);
 
-       var bd = context.createBassDrum();
+       bd = context.createDrum();
        bd.connect(context.destination);
 
-       var sn = context.createSnare();
+       sn = context.createSnare();
        sn.connect(context.destination);
 
-       var cp = context.createClap();
+       cp = context.createClap();
        cp.connect(context.destination);
 
-       var rm = context.createRim();
+       rm = context.createRim();
        rm.connect(context.destination);
 
 
@@ -36,6 +41,7 @@
          sn:sn,
          cp:cp,
          rm:rm,
+         ch:ch,
          hh:hh,
          oh:oh,
        });
@@ -43,7 +49,7 @@
        loop.setBPM(120);
        loop.setBeatUnit(1 / 16);
 
-       loop.setSequences({hh:'',oh:'',sn:'',bd:'',cp:'',rm:''});
+       loop.setSequences({ch:'',hh:'',oh:'',sn:'',bd:'',cp:'',rm:''});
        //loop.setSequences({hh:'  *   * ', sn:'    *   ', bd:'*   *   '});
        //loop.setSequences({bd:' *  ', cp:'   *', oh: '', rm: ' *  *  *', hh: ' *   *  ', oh: '      * ' });
 
