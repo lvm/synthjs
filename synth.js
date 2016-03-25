@@ -99,7 +99,7 @@
   function Drum(context, freq, a, d, s, r){
     this.osc = context.createOscillator();
     this.osc.frequency.value = freq;
-    this.osc.type = 'square';
+    this.osc.type = 'sine';
     var env = this.env = context.createEnvelope(a, d, s, r);
     this.osc.start(0);
     this.osc.connect(this.env);
@@ -115,7 +115,7 @@
   function Snare(context, freq, a, d, s, r){
     this.noiseGen = context.createNoiseGen();
     this.filter = context.createBiquadFilter();
-    this.filter.type = "highpass";
+    this.filter.type = "bandpass";
     this.filter.frequency.value = freq;
     this.noiseGen.connect(this.filter);
     this.env = context.createEnvelope(a,d,s,r);
@@ -218,15 +218,15 @@
 
   // bass drum
   AudioContext.prototype.createDrum = function(freq,a,d,s,r){
-    return new Drum(this, freq||50, a||0.001, d||0.1, s||0, r||0.5);
+    return new Drum(this, freq||50, a||0.001, d||0.1, s||0, r||0.25);
   };
 
   // snare, toms
   AudioContext.prototype.createSnare = function(freq,a,d,s,r){
-    return new Snare(this, freq||750, a||0.001, d||0.05, s||0, r||0.1);
+    return new Snare(this, freq||550, a||0.001, d||0.05, s||0, r||0.1);
   };
   AudioContext.prototype.createClap = function(freq,a,d,s,r){
-    return new Clap(this,freq||950,a||0.001,d||0.01,s||0.1,r||0.1);
+    return new Clap(this,freq||950,a||0.001,d||0.01,s||0.1,r||0.25);
   };
   AudioContext.prototype.createRim = function(freq,a,d,s,r){
     return new Rim(this,freq||950,a||0.001,d||0.01,s||0.1,r||0.1);
@@ -234,7 +234,7 @@
 
   // hats
   AudioContext.prototype.createClosehat = function(freq,a,d,s,r){
-    return new Closehat(this, freq||10000,a||0.001,d||0.05,s||0,r||0.15);
+    return new Closehat(this, freq||10000,a||0.001,d||0.05,s||0,r||0.1);
   };
   AudioContext.prototype.createHiHat = function(freq,a,d,s,r){
     return new HiHat(this,freq||5000,a||0.001, d||0.05, s||0, r||0.2);
@@ -283,7 +283,7 @@
     if (this.stopped) return;
     each(this.tracks, function(track, name){
       var currNote = track.loop[track.loopPos];
-      if (currNote === '*'){
+      if (currNote){
         track.instrument.trigger();
       }
       this.onPlay(name, track.loopPos);
